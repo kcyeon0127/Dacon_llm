@@ -1,0 +1,1 @@
+{"train_step_loss": [0.7374614477157593, 0.7530717253684998], "train_epoch_loss": [], "train_step_perplexity": [2.0906217098236084, 2.1235129833221436], "train_epoch_perplexity": [], "val_step_loss": [], "val_epoch_loss": [], "val_step_perplexity": [], "val_epoch_perplexity": []}
