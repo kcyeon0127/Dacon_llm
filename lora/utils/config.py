@@ -23,8 +23,8 @@ class Lora_config:
 class Train_config:
     model_name:str = "juungwon/Llama-3-instruction-constructionsafety"
     # model_name:str = "DBCMLAB/Llama-3-instruction-constructionsafety-layertuning"
-    batch_size_training:int = 16
-    gradient_accumulation_steps:int = 2
+    batch_size_training:int = 8
+    gradient_accumulation_steps:int = 4
     gradient_clipping:bool = True
     gradient_clipping_threshold:float = 1.0
     num_epochs:int = 50
