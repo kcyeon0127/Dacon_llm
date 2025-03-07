@@ -6,8 +6,8 @@ from sentence_transformers import SentenceTransformer
 
 ROOT_DIR = "/home/elicer/DaconAcc/results"
 
-txt_file_path = '/home/elicer/DaconAcc/finetuned_juungwon_WO_Quant_output_ngram1.txt'
-csv_file_name = 'finetuned_juungwon_WO_Quant_ngram1.csv'
+txt_file_path = '/home/elicer/DaconAcc/finetuned_juungwon_WO_Quant_Sim_output_ngram1.txt'
+csv_file_name = 'finetuned_juungwon_WO_Quant_Sim_output_ngram1.csv'
 
 with open(txt_file_path) as f:
     generated_texts = f.read().strip().split('\n')

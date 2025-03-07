@@ -22,7 +22,7 @@ if __name__ == '__main__':
     postprocessed = []
     # file_path = "/home/elicer/DaconAcc/lora/8bit_finetuned_result_valid_fewshot0_outputs.txt"
     # file_path = "/home/elicer/DaconAcc/DBCMLAB_8bit_fewshot0_output.txt"
-    file_path = "/home/elicer/DaconAcc/finetuned_juungwon_WO_Quant_output.txt"
+    file_path = "/home/elicer/DaconAcc/finetuned_juungwon_WO_Quant_Sim_output.txt"
     with open(file_path) as f:
         outputs = [line.strip() for line in f]
     for output in outputs:
@@ -30,7 +30,7 @@ if __name__ == '__main__':
         postprocessed.append(clean_text)
     
     # save_path = "/home/elicer/DaconAcc/lora/8bit_finetuned_result_valid_fewshot0_outputs_post.txt"
-    save_path = "/home/elicer/DaconAcc/finetuned_juungwon_WO_Quant_output_ngram1.txt"
+    save_path = "/home/elicer/DaconAcc/finetuned_juungwon_WO_Quant_Sim_output_ngram1.txt"
     with open(save_path, 'w') as f:
         for line in postprocessed:
             f.write(line + '\n')

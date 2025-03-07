@@ -29,12 +29,12 @@ class Train_config:
     gradient_clipping:bool = True
     gradient_clipping_threshold:float = 1.0
     num_epochs:int = 50
-    lr:float = 2e-4
+    lr:float = 2e-5 
     weight_decay:float = 0.0
     gamma:float = 0.85
     seed:int = 42
     val_batch_size:int = 8
-    output_dir:str = "finetuned_juungwon_WO_Quant"
+    output_dir:str = "finetuned_juungwon_8bit_Quant"
     
 def update_config(config,**kwargs) -> None:
     """
