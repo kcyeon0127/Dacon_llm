@@ -1,3 +1,6 @@
+import sys
+sys.path.append('/home/elicer/DaconAcc/')
+
 from utils import (
     get_lora_config,
     get_train_config,
@@ -47,33 +50,34 @@ def main(
     quant_config = BitsAndBytesConfig(
         # load_in_8bit=True,
         # bnb_4bit_quant_type="nf4",
-        # llm_int8_enable_fp32_cpu_offload=True,
-        # bnb_4bit_compute_dtype=torch_dtype,
+        # llm_int8_enable_fp32_cpu_offload=True, ###
+        # bnb_4bit_compute_dtype=torch_dtype, ###
         # bnb_4bit_use_double_quant=False,
     )
     
     model = AutoModelForCausalLM.from_pretrained(model_id, quantization_config=quant_config, device_map="auto")
+    
+    # model = AutoModelForCausalLM.from_pretrained(lora_path, quantization_config=quant_config, device_map="auto")
+    
+    
     model.eval()
     for param in model.parameters():
         param.requires_grad = False
         
     tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=True)    
     
-    # lora_path = "/home/elicer/DaconAcc/finetuned_ko-r1-14b-v2.0.3" ###
-    # model = PeftModel.from_pretrained(model, lora_path) ###
+    lora_path = "/home/elicer/DaconAcc/finetuned_juungwon_WO_Quant"
+    model = PeftModel.from_pretrained(model, lora_path) ###
 
-
-
-    
-    # for name, param in model.named_parameters():
-    #     if "lora" in name:
-    #         param.requires_grad = True
+    for name, param in model.named_parameters():
+        if "lora" in name:
+            param.requires_grad = True
 
     tokenizer.pad_token = tokenizer.eos_token
     tokenizer.padding_side = "left"
 
-    lora_config = get_lora_config(**kwargs)
-    model = get_peft_model(model, lora_config)
+    # lora_config = get_lora_config(**kwargs)
+    # model = get_peft_model(model, lora_config)
     model.print_trainable_parameters()
     
     train_dataset = get_dataset(

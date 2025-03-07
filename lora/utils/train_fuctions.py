@@ -101,8 +101,8 @@ def train(model, train_dataloader,eval_dataloader, tokenizer, optimizer, lr_sche
     epoch_times = []
     checkpoint_times = []
     results = {}
-    best_val_loss = float("inf")
-    best_val_similarity = 0.0
+    best_val_loss = 1.376638650894165 # float("inf")
+    best_val_similarity = 3.9615628719329834 # 0.0
 
     for epoch in range(train_config.num_epochs):
         epoch_start_time = time.perf_counter()
@@ -122,6 +122,7 @@ def train(model, train_dataloader,eval_dataloader, tokenizer, optimizer, lr_sche
                 total_loss += loss.detach().float()
                 loss.backward()
                 if (step + 1) % gradient_accumulation_steps == 0 or step == len(train_dataloader) - 1:
+                    
                     if train_config.gradient_clipping and train_config.gradient_clipping_threshold > 0.0:
                         torch.nn.utils.clip_grad_norm_(model.parameters(), train_config.gradient_clipping_threshold)
                     optimizer.step()
@@ -129,8 +130,9 @@ def train(model, train_dataloader,eval_dataloader, tokenizer, optimizer, lr_sche
                     pbar.update(1)
                 pbar.set_description(f"Training Epoch: {epoch+1}/{train_config.num_epochs}, step {step}/{len(train_dataloader)} completed (loss: {loss.detach().float()})")
                 save_to_json(metrics_filename, train_step_loss, train_loss, train_step_perplexity, train_prep, val_step_loss, val_loss, val_step_perplexity, val_prep)
-            
+                
             pbar.close()
+                
 
         epoch_end_time = time.perf_counter()-epoch_start_time
         epoch_times.append(epoch_end_time)
@@ -154,7 +156,7 @@ def train(model, train_dataloader,eval_dataloader, tokenizer, optimizer, lr_sche
             
         if best_val_similarity < similarity:
             model.save_pretrained(train_config.output_dir + "_similarity")
-            print(f"PEFT modules are saved in {train_config.output_dir} directory")
+            print(f"PEFT modules are saved in {train_config.output_dir}_similarity directory")
             best_val_similarity = similarity
             print(f"best eval similarity on epoch {epoch+1} is {best_val_similarity}")
             
@@ -164,6 +166,7 @@ def train(model, train_dataloader,eval_dataloader, tokenizer, optimizer, lr_sche
         val_loss.append(float(best_val_loss))
         val_prep.append(float(eval_ppl))
         print(f"Epoch {epoch+1}: train_perplexity={train_perplexity:.4f}, train_epoch_loss={train_epoch_loss:.4f}, epoch time {epoch_end_time}s")
+        print("Similarity:", similarity)
         save_to_json(metrics_filename, train_step_loss, train_loss, train_step_perplexity, train_prep, val_step_loss, val_loss, val_step_perplexity, val_prep)
     
     avg_epoch_time = sum(epoch_times)/ len(epoch_times)
@@ -187,14 +190,15 @@ def train(model, train_dataloader,eval_dataloader, tokenizer, optimizer, lr_sche
 def extract_output(outputs):
     generated_texts = []
     for output in outputs:
-        output = output.split("<|start_header_id|>assistant<|end_header_id|>")[1].split("<|eot_id|>")[0].strip()
+        if "<|start_header_id|>assistant<|end_header_id|>" in output:
+            output = output.split("<|start_header_id|>assistant<|end_header_id|>")[1].strip()
+        if "<|eot_id|>" in output:
+            output = output.split("<|eot_id|>")[0].strip()
         generated_texts.append(output)
     return generated_texts
 
 def eval_similarity(outputs: List[str]):
-    print()
-    print(outputs[0])
-    print()
+
     generated_texts = extract_output(outputs)
     print()
     print(generated_texts[0])
@@ -204,8 +208,6 @@ def eval_similarity(outputs: List[str]):
     valid_answers = pd.read_csv(val_path)["answer"].tolist()
 
     score, _ = evaluater.evaluate(generated_texts, valid_answers)
-    print(score)
-    exit()
     return score
 
 def evaluation(model,train_config, eval_dataloader, tokenizer):
@@ -229,14 +231,15 @@ def evaluation(model,train_config, eval_dataloader, tokenizer):
 
                 eval_loss += loss.detach().float()
                 
-                decoded_texts = tokenizer.batch_decode(outputs, skip_special_tokens=True)
+                token_ids = torch.argmax(outputs.logits, dim=-1)
+                decoded_texts = tokenizer.batch_decode(token_ids, skip_special_tokens=False)
                 generated_texts += decoded_texts
 
             # Decode predictions and add to evaluation predictions list
-            preds = torch.argmax(outputs.logits, -1)
-            eval_preds.extend(
-                tokenizer.batch_decode(preds.detach().cpu().numpy(), skip_special_tokens=True)
-            )
+            # preds = torch.argmax(outputs.logits, -1)
+            # eval_preds.extend(
+            #     tokenizer.batch_decode(preds.detach().cpu().numpy(), skip_special_tokens=True)
+            # )
     # If there's more than one CUDA device, reduce evaluation loss across all devices
 
     similarity = eval_similarity(generated_texts)

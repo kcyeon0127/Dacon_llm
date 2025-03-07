@@ -7,6 +7,7 @@ from typing import List
 
 from peft import LoraConfig
 
+from transformers import AutoModelForCausalLM
 
 @dataclass
 class Lora_config:
@@ -34,7 +35,7 @@ class Train_config:
     seed:int = 42
     val_batch_size:int = 8
     output_dir:str = "finetuned_juungwon_WO_Quant"
-
+    
 def update_config(config,**kwargs) -> None:
     """
     This function changes the values of config according to kwargs.

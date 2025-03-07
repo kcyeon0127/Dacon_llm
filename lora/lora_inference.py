@@ -11,17 +11,21 @@ from tqdm import tqdm
 from lora.search_system import SearchEngine
 
 
-model_id = "DBCMLAB/Llama-3-instruction-constructionsafety-layertuning"
-lora_path = "/home/elicer/DaconAcc/finetuned_DBCMLAB"
+# model_id = "DBCMLAB/Llama-3-instruction-constructionsafety-layertuning"
+# lora_path = "/home/elicer/DaconAcc/finetuned_DBCMLAB"
+    
+model_id = "juungwon/Llama-3-instruction-constructionsafety"
+lora_path = "/home/elicer/DaconAcc/finetuned_juungwon_WO_Quant"
+    
     
 torch_dtype = torch.float16
 
-quant_config = BitsAndBytesConfig(
-    load_in_8bit=True,
-    bnb_4bit_quant_type="nf4",
-    bnb_4bit_compute_dtype=torch_dtype,
-    bnb_4bit_use_double_quant=False,
-)
+# quant_config = BitsAndBytesConfig(
+#     load_in_8bit=True,
+#     bnb_4bit_quant_type="nf4",
+#     bnb_4bit_compute_dtype=torch_dtype,
+#     bnb_4bit_use_double_quant=False,
+# )
 
 # model = AutoModelForCausalLM.from_pretrained(model_id, quantization_config=quant_config, device_map="auto")
 model = AutoModelForCausalLM.from_pretrained(lora_path)
@@ -42,7 +46,8 @@ pipe = pipeline("text-generation", model=model, tokenizer = tokenizer, torch_dty
 
 # txt_save_path = "DBCMLAB_8bit_finetuned_result_valid_fewshot0.txt"
 # test_path = "/home/elicer/DaconAcc/dataset/valid_prompt.csv"
-txt_save_path = "DBCMLAB_8bit_fewshot0.txt"
+txt_save_path = "finetuned_juungwon_WO_Quant.txt"
+
 test_path = "/home/elicer/DaconAcc/dataset/test_prompt.csv"
 dataset = pd.read_csv(test_path)["question"].tolist()
 
