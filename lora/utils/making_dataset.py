@@ -38,7 +38,7 @@ class LengthBasedBatchSampler(torch.utils.data.BatchSampler):
 
 
 def get_dataset(tokenizer,split:str):
-    train_path = "/home/elicer/DaconAcc/dataset/train_drop_prompt.csv"
+    train_path = "/home/elicer/DaconAcc/dataset/unique_train_drop_prompt_0.85.csv" #"/home/elicer/DaconAcc/dataset/train_drop_prompt.csv"
     valid_path = "/home/elicer/DaconAcc/dataset/valid_prompt.csv"
     path = train_path if split == "train" else valid_path
     
@@ -84,6 +84,37 @@ def get_dataset(tokenizer,split:str):
 
     print()
     print(tokenizer.decode(dataset[0]["input_ids"]))
+    print()
+    return dataset
+
+
+def get_valid_input_dataset(tokenizer):
+    path = "/home/elicer/DaconAcc/dataset/valid_prompt.csv"
+    dataset = pd.read_csv(path)
+    
+    dataset = Dataset.from_pandas(dataset)
+
+    def tokenize_add_label(sample):
+        question = [
+            {"role": "user", "content": sample["question"]}
+        ]
+        system_token = "<|start_header_id|>system<|end_header_id|>\n\n친절한 건설안전전문가로서 상대방의 요청에 최대한 '자세하고' 친절하게 답하자. 모든 대답은 한국어(Korean)으로 대답해줘.<|eot_id|>"
+        bos_token = "<|begin_of_text|>"
+        
+        encoded_input = tokenizer.apply_chat_template(question, tokenize=False, add_generation_prompt=True).strip()
+        if encoded_input.strip()[:len(bos_token)] == bos_token:
+            encoded_input = encoded_input[len(bos_token):]
+        encoded_input = tokenizer.bos_token + system_token + encoded_input
+        
+        sample = {
+            "text": encoded_input
+        }
+
+        return sample
+    dataset = dataset.map(tokenize_add_label, remove_columns=list(dataset.features))
+
+    print()
+    print(dataset[0]["text"])
     print()
     return dataset
 

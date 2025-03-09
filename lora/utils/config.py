@@ -25,16 +25,19 @@ class Train_config:
     model_name:str = "juungwon/Llama-3-instruction-constructionsafety"
     # model_name:str = "DBCMLAB/Llama-3-instruction-constructionsafety-layertuning"
     batch_size_training:int = 8
-    gradient_accumulation_steps:int = 4
+    gradient_accumulation_steps:int = 2
     gradient_clipping:bool = True
     gradient_clipping_threshold:float = 1.0
     num_epochs:int = 50
-    lr:float = 2e-5 
+    lr:float =1e-4
     weight_decay:float = 0.0
     gamma:float = 0.85
     seed:int = 42
-    val_batch_size:int = 8
-    output_dir:str = "finetuned_juungwon_8bit_Quant"
+    val_batch_size:int = 32
+    save_best_similarity:bool = True
+    eval_strategy:str = "epoch" # "step"
+    eval_step:int = 500
+    output_dir:str = "/home/elicer/DaconAcc/finetuned_models/unique_finetuned_juungwon_8bit_Quant_0.85"
     
 def update_config(config,**kwargs) -> None:
     """

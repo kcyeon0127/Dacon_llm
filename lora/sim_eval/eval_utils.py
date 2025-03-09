@@ -29,10 +29,10 @@ class Evaluater:
         return intersection / union if union != 0 else 0
     
     def evaluate(self, texts1: List[str], texts2: List[str]) -> float:
-        assert len(texts1) == len(texts2)
+        # assert len(texts1) == len(texts2)
 
         results = []
-        for text1, text2 in zip(tqdm(texts1), texts2):
+        for text1, text2 in zip(texts1, texts2):
             vec1, vec2 = self.vectorize(text1)[0], self.vectorize(text2)[0]
             value = 0.7 * self.cosine_similarity(vec1, vec2) + 0.3 * self.jaccard_similarity(text1, text2)
             results.append(value)

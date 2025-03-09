@@ -5,6 +5,7 @@ from utils import (
     get_lora_config,
     get_train_config,
     get_dataset,
+    get_valid_input_dataset,
     get_dataloader_kwargs,
     train
 )
@@ -48,11 +49,11 @@ def main(
     torch_dtype = torch.float16
 
     quant_config = BitsAndBytesConfig(
-        # load_in_8bit=True,
-        # bnb_4bit_quant_type="nf4",
-        # llm_int8_enable_fp32_cpu_offload=True, ###
-        # bnb_4bit_compute_dtype=torch_dtype, ###
-        # bnb_4bit_use_double_quant=False,
+        load_in_8bit=True,
+        bnb_4bit_quant_type="nf4",
+        llm_int8_enable_fp32_cpu_offload=True, ###
+        bnb_4bit_compute_dtype=torch_dtype, ###
+        bnb_4bit_use_double_quant=False,
     )
     
     model = AutoModelForCausalLM.from_pretrained(model_id, quantization_config=quant_config, device_map="auto")
